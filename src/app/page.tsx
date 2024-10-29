@@ -10,7 +10,7 @@ export default function Home() {
       </div>
       <div>
         <Button asChild className="text-xl">
-          <Link href="/">Sign In</Link>
+          <Link href="/dashboard">Sign In</Link>
         </Button>
       </div>
     </main>
