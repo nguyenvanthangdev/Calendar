@@ -1,11 +1,9 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
-import { auth } from "../lib/auth";
-import { redirect } from "next/navigation";
+import { requireUser } from "../lib/hooks";
 const DashbaordPage = async () => {
-  const session = await auth();
-  if (!session) return redirect("/");
+  await requireUser();
   return (
     <>
       <div className="flex items-center justify-between px-2">
