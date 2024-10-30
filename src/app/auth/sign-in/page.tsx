@@ -16,6 +16,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Link from "next/link";
+import { googleSignIn } from "@/app/lib/signInActions";
+
+import { signIn } from "@/app/lib/auth";
+
 const formSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -31,6 +35,10 @@ export default function SignInPage() {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log({ values });
   };
+  const handleGitHubSignIn = async () => {
+    await signIn("github");
+  };
+
   return (
     <Card className="w-full h-full md:w-[487px] border-none shadow-none">
       <CardHeader className="flex items-center text-center justify-center p-7">
@@ -84,20 +92,18 @@ export default function SignInPage() {
         <DottedSeparator />
       </div>
       <CardContent className="p-7 flex flex-col gap-y-4">
+        <form onSubmit={googleSignIn}>
+          <Button variant="secondary" size="lg" className="w-full">
+            <FcGoogle className="mr-2 size-5" />
+            Login with Google
+          </Button>
+        </form>
+
         <Button
-          disabled={false}
           variant="secondary"
           size="lg"
           className="w-full"
-        >
-          <FcGoogle className="mr-2 size-5" />
-          Login with Google
-        </Button>
-        <Button
-          disabled={false}
-          variant="secondary"
-          size="lg"
-          className="w-full"
+          onClick={handleGitHubSignIn}
         >
           <FaGithub className="mr-2 size-5" />
           Login with Gihub
@@ -109,7 +115,7 @@ export default function SignInPage() {
       <CardContent className="flex items-center justify-center p-7">
         <p>
           Don&apos;t have an account?
-          <Link href="/sign-up">
+          <Link href="/auth/sign-up">
             <span className="text-blue-700">&nbsp;Sign Up</span>
           </Link>
         </p>

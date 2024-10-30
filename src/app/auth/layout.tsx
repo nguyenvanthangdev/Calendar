@@ -10,7 +10,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const isSignIn = pathname === "/sign-in";
+  const isSignIn = pathname === "/auth/sign-in";
   return (
     <main className="bg-neutral-100 min-h-screen">
       <div className="mx-auto max-w-screen-2xl">
@@ -21,7 +21,7 @@ export default function AuthLayout({
           </div>
           <div className="flex items-center gap-2">
             <Button asChild className="text-xl" variant="default">
-              <Link href={isSignIn ? "/sign-up" : "/sign-in"}>
+              <Link href={isSignIn ? "/auth/sign-up" : "/auth/sign-in"}>
                 {isSignIn ? "Sign Up" : "Login"}
               </Link>
             </Button>

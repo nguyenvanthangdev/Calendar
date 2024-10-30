@@ -144,7 +144,7 @@ export default function SignUpPage() {
       <CardContent className="flex items-center justify-center p-7">
         <p>
           Already have an account?
-          <Link href="/sign-in">
+          <Link href="/auth/sign-in">
             <span className="text-blue-700">&nbsp;Sign In</span>
           </Link>
         </p>

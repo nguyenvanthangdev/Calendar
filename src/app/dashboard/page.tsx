@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
 //import { requireUser } from "../lib/hooks";
-const DashbaordPage = async () => {
+export default async function DashboardPage() {
   //await requireUser();
   return (
     <>
@@ -19,6 +19,4 @@ const DashbaordPage = async () => {
       </div>
     </>
   );
-};
-
-export default DashbaordPage;
+}

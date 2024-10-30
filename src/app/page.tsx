@@ -11,7 +11,7 @@ export default function Home() {
       </div>
       <div>
         <Button asChild className="text-xl">
-          <Link href="/sign-in">Sign In</Link>
+          <Link href="/auth/sign-in">Sign In</Link>
         </Button>
       </div>
     </main>
