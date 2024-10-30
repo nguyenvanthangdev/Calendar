@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
-import { requireUser } from "../lib/hooks";
+//import { requireUser } from "../lib/hooks";
 const DashbaordPage = async () => {
-  await requireUser();
+  //await requireUser();
   return (
     <>
       <div className="flex items-center justify-between px-2">

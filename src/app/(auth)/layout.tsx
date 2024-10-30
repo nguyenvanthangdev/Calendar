@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Logo from "@/app/assets/logo.svg";
 export default function AuthLayout({
   children,
 }: Readonly<{
@@ -15,7 +16,7 @@ export default function AuthLayout({
       <div className="mx-auto max-w-screen-2xl">
         <nav className="flex justify-between items-center">
           <div className="flex gap-3 mx-2 my-5">
-            <Image src="/logo.svg" width={50} height={50} alt="Logo" />
+            <Image src={Logo} width={50} height={50} alt="Logo" />
             <h3 className="text-4xl font-bold">Calendar</h3>
           </div>
           <div className="flex items-center gap-2">
