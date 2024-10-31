@@ -19,6 +19,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { handleSignOut } from "@/app/lib/logout";
+
 export default function DashboardLayout({
   children,
 }: {
@@ -94,14 +96,18 @@ export default function DashboardLayout({
         <div className="flex justify-center p-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button>
-                <CircleUserRound className="h-5 w-5" />
-              </button>
+              <Button>
+                <CircleUserRound className="h-10 w-10" />
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem>
-                <LogOut />
-                <span>Log out</span>
+                <form action={handleSignOut}>
+                  <button className="flex items-center">
+                    <LogOut className="h-4 w-4" />
+                    <span>Log out</span>
+                  </button>
+                </form>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
