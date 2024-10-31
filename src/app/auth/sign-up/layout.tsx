@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,26 +20,18 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-
 import { useToast } from "@/hooks/use-toast";
-
-const formSchema = z.object({
-  name: z.string().trim().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
+import { ToastAction } from "@/components/ui/toast";
+import { registerSchema } from "@/app/lib/schemas";
 export default function SignUpPage({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  type FormData = z.infer<typeof registerSchema>;
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -56,11 +47,27 @@ export default function SignUpPage({
       });
       if (response.ok) {
         toast({
-          description: "Đăng ký thành công !",
+          title: "Notification",
+          description: "User created successfully !",
+          action: <ToastAction altText="Undo">Undo</ToastAction>,
+        });
+        form.reset();
+      } else {
+        const errorData = await response.json();
+        toast({
+          variant: "destructive",
+          title: "Something went wrong !",
+          description: errorData.message,
+          action: <ToastAction altText="Try again">Try again</ToastAction>,
         });
       }
     } catch (err) {
-      setError("An unexpected error occurred");
+      toast({
+        title: "Something went wrong !",
+        variant: "destructive",
+        description: "An unexpected error occurred",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
       console.error(err);
     }
   };
@@ -133,11 +140,6 @@ export default function SignUpPage({
                 </FormItem>
               )}
             />
-            {error && (
-              <p className="text-red-500 text-sm mt-2" role="alert">
-                {error}
-              </p>
-            )}
             <Button disabled={false} size="lg" className="w-full">
               {form.formState.isSubmitting ? "Signing up..." : "Sign Up"}
             </Button>

@@ -2,7 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Logo from "@/app/assets/logo.svg";
-export default function Home() {
+import { auth } from "@/app/lib/auth";
+export default async function Home() {
+  const session = await auth();
   return (
     <main className="flex flex-col justify-center h-screen text-center gap-6 max-w-5xl mx-auto">
       <div className="flex justify-center gap-1">
@@ -11,7 +13,9 @@ export default function Home() {
       </div>
       <div>
         <Button asChild className="text-xl">
-          <Link href="/auth/sign-in">Sign In</Link>
+          <Link href={!session?.user?.id ? "/auth/sign-in" : "/dashboard"}>
+            {!session?.user?.id ? "Sign In" : "Dashboard"}
+          </Link>
         </Button>
       </div>
     </main>

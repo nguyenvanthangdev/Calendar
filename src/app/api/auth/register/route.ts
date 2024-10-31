@@ -1,18 +1,17 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid"; // Tạo UUID cho sessionToken
-import dayjs from "dayjs"; // Sử dụng để tính thời gian hết hạn của session
-import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from "uuid";
+import dayjs from "dayjs";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
+
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return NextResponse.json(
         { message: "User already exists" },
@@ -23,27 +22,28 @@ export async function POST(req: Request) {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create the user
+    // Create the user and associated account in one transaction
     const newUser = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
+        accounts: {
+          create: {
+            type: "credentials",
+            provider: "custom",
+            providerAccountId: uuidv4(),
+            access_token: uuidv4(),
+            token_type: "bearer",
+            id_token: uuidv4(),
+          },
+        },
       },
     });
-    await prisma.account.create({
-      data: {
-        userId: newUser.id,
-        type: "credentials", // Kiểu đăng nhập là 'credentials'
-        provider: "custom", // Provider mặc định là 'custom'
-        providerAccountId: newUser.id, // ID tài khoản từ người dùng
-        access_token: uuidv4(), // Tạo access_token ngẫu nhiên
-        token_type: "Bearer", // Thiết lập token_type là 'Bearer'
-        id_token: uuidv4(),
-      },
-    });
-    const sessionToken = uuidv4(); // Tạo UUID cho sessionToken
-    const sessionExpiry = dayjs().add(1, "day").toDate(); // Phiên hết hạn sau 1 ngày
+
+    // Create the session
+    const sessionToken = uuidv4();
+    const sessionExpiry = dayjs().add(1, "day").toDate();
     await prisma.session.create({
       data: {
         userId: newUser.id,
@@ -51,6 +51,7 @@ export async function POST(req: Request) {
         expires: sessionExpiry,
       },
     });
+
     return NextResponse.json(
       { message: "User created successfully" },
       { status: 201 }

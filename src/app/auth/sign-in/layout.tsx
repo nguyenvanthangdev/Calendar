@@ -14,25 +14,42 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Link from "next/link";
+import { loginSchema } from "@/app/lib/schemas";
+//import { signIn } from "@/app/lib/auth";
+import { redirect } from "next/navigation";
+import { loginUser } from "@/app/lib/loginAction"; // Import Server Action
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+
 export default function SignInLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const formSchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-  });
+  const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    const res = await loginUser(values); // Gọi Server Action
+
+    if (res?.ok) {
+      // Redirect to the dashboard or desired page on successful login
+      redirect("/dashboard");
+      //router.push("/dashboard");
+    } else {
+      toast({
+        title: "Something went wrong !",
+        variant: "destructive",
+        description: "An unexpected error occurred",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
+    }
   };
   return (
     <div>
