@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,18 +22,24 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+import { useToast } from "@/hooks/use-toast";
+
+const formSchema = z.object({
+  name: z.string().trim().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
 export default function SignUpPage({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const formSchema = z.object({
-    name: z.string().trim().min(1, "Required"),
-    email: z.string().email(),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-  });
-
-  const form = useForm<z.infer<typeof formSchema>>({
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -40,8 +47,22 @@ export default function SignUpPage({
       password: "",
     },
   });
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({ values });
+  const onSubmit = async (values: FormData) => {
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      if (response.ok) {
+        toast({
+          description: "Đăng ký thành công !",
+        });
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+      console.error(err);
+    }
   };
   return (
     <Card className="w-full h-full md:w-[487px] border-none shadow-none">
@@ -112,8 +133,13 @@ export default function SignUpPage({
                 </FormItem>
               )}
             />
+            {error && (
+              <p className="text-red-500 text-sm mt-2" role="alert">
+                {error}
+              </p>
+            )}
             <Button disabled={false} size="lg" className="w-full">
-              Login
+              {form.formState.isSubmitting ? "Signing up..." : "Sign Up"}
             </Button>
           </form>
         </Form>
