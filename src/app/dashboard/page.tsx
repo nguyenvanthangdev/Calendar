@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
-import { requireUser } from "../lib/hooks";
+import { requireUser } from "../lib/session";
 export default async function DashboardPage() {
   await requireUser();
   return (

@@ -4,16 +4,15 @@ import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/app/lib/db";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
+import { signInSchema } from "@/app/lib/zod";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
     GitHub({
       allowDangerousEmailAccountLinking: true,
     }),
-    Google({
-      allowDangerousEmailAccountLinking: true,
-    }),
+    Google,
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -21,46 +20,42 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Email and password are required");
+        try {
+          const parsedCredentials = await signInSchema.safeParse(credentials);
+          if (!parsedCredentials.success) {
+            console.error(
+              "Invalid credentials:",
+              parsedCredentials.error.errors
+            );
+            return null;
+          }
+          const res = await fetch(
+            `${process.env.NEXTAUTH_URL}/api/auth/login`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(credentials),
+            }
+          );
+
+          const user = await res.json();
+          if (!res.ok) {
+            throw new Error(user.message);
+          }
+          return user;
+        } catch (error) {
+          console.error("Error during authorization:", error);
+          return null;
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (!user || !user.password) {
-          throw new Error("Invalid credentials");
-        }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-        if (!isPasswordValid) {
-          throw new Error("Invalid credentials");
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
       },
     }),
   ],
   callbacks: {
-    async session({ session, user }) {
-      session.user = user;
-      return session;
-    },
-    async jwt({ token, user }) {
-      if (user) token.id = user.id;
-      return token;
-    },
     authorized: async ({ auth }) => {
       return !!auth;
     },
+  },
+  pages: {
+    signIn: "/auth/sign-in",
   },
 });

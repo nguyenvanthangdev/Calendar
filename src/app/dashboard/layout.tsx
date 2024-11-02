@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { handleSignOut } from "@/app/lib/logout";
+import { handleSignOut } from "@/app/actions/authAction";
 
 export default function DashboardLayout({
   children,

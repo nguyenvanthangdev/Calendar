@@ -23,6 +23,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { registerSchema } from "@/app/lib/schemas";
+
 export default function SignUpPage({
   children,
 }: {
@@ -45,6 +46,7 @@ export default function SignUpPage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
+
       if (response.ok) {
         toast({
           title: "Notification",
@@ -63,7 +65,7 @@ export default function SignUpPage({
       }
     } catch (err) {
       toast({
-        title: "Something went wrong !",
+        title: "Error !",
         variant: "destructive",
         description: "An unexpected error occurred",
         action: <ToastAction altText="Try again">Try again</ToastAction>,

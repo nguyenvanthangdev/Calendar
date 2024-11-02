@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid";
-import dayjs from "dayjs";
+//import { v4 as uuidv4 } from "uuid";
+//import dayjs from "dayjs";
 import bcrypt from "bcryptjs";
+const salt = bcrypt.genSaltSync(10);
 
 const prisma = new PrismaClient();
 
@@ -20,37 +21,38 @@ export async function POST(req: Request) {
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hashSync(password, salt);
 
     // Create the user and associated account in one transaction
-    const newUser = await prisma.user.create({
+    //const newUser =
+    await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        accounts: {
-          create: {
-            type: "credentials",
-            provider: "custom",
-            providerAccountId: uuidv4(),
-            access_token: uuidv4(),
-            token_type: "bearer",
-            id_token: uuidv4(),
-          },
-        },
+        // accounts: {
+        //   create: {
+        //     type: "credentials",
+        //     provider: "custom",
+        //     providerAccountId: uuidv4(),
+        //     access_token: uuidv4(),
+        //     token_type: "bearer",
+        //     id_token: uuidv4(),
+        //   },
+        // },
       },
     });
 
     // Create the session
-    const sessionToken = uuidv4();
-    const sessionExpiry = dayjs().add(1, "day").toDate();
-    await prisma.session.create({
-      data: {
-        userId: newUser.id,
-        sessionToken,
-        expires: sessionExpiry,
-      },
-    });
+    // const sessionToken = uuidv4();
+    // const sessionExpiry = dayjs().add(1, "day").toDate();
+    // await prisma.session.create({
+    //   data: {
+    //     userId: newUser.id,
+    //     sessionToken,
+    //     expires: sessionExpiry,
+    //   },
+    // });
 
     return NextResponse.json(
       { message: "User created successfully" },
