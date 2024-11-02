@@ -3,8 +3,8 @@ import { auth } from "@/app/lib/auth";
 
 export async function requireUser() {
   const session = await auth();
-
-  if (!session?.user?.id) {
+  console.log("Session in requireUser:", session);
+  if (!session?.user) {
     return redirect("/");
   }
 

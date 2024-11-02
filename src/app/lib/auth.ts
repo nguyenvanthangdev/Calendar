@@ -39,6 +39,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           );
 
           const user = await res.json();
+          console.log("check user", user);
           if (!res.ok) {
             throw new Error(user.message);
           }
@@ -51,6 +52,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
+    async session({ session, user }) {
+      session.user = user;
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) token.id = user.id;
+      return token;
+    },
     authorized: async ({ auth }) => {
       return !!auth;
     },
