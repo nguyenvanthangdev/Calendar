@@ -1,6 +1,9 @@
 "use client";
+import {
+  GitHubAuthButton,
+  GoogleAuthButton,
+} from "@/components/loading-button";
 import { DottedSeparator } from "@/components/dotted-separator";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -23,12 +26,12 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { registerSchema } from "@/app/lib/schemas";
-
-export default function SignUpPage({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import {
+  handleSignInGithub,
+  handleSignInGoogle,
+} from "@/app/actions/authAction";
+import LoadingButton from "@/components/loading-button";
+export default function SignUpPage() {
   const { toast } = useToast();
   type FormData = z.infer<typeof registerSchema>;
   const form = useForm<FormData>({
@@ -46,7 +49,6 @@ export default function SignUpPage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-
       if (response.ok) {
         toast({
           title: "Notification",
@@ -142,23 +144,28 @@ export default function SignUpPage({
                 </FormItem>
               )}
             />
-            <Button disabled={false} size="lg" className="w-full">
-              {form.formState.isSubmitting ? "Signing up..." : "Sign Up"}
-            </Button>
+            <LoadingButton pending={form.formState.isSubmitting} />
           </form>
         </Form>
       </CardContent>
       <div className="p-7">
         <DottedSeparator />
       </div>
-      {children}
+      <CardContent className="p-7 flex flex-col gap-y-4">
+        <form action={handleSignInGoogle}>
+          <GoogleAuthButton />
+        </form>
+        <form action={handleSignInGithub}>
+          <GitHubAuthButton />
+        </form>
+      </CardContent>
       <div className="px-7">
         <DottedSeparator />
       </div>
       <CardContent className="flex items-center justify-center p-7">
         <p>
           Already have an account?
-          <Link href="/auth/sign-in">
+          <Link href="/sign-in">
             <span className="text-blue-700">&nbsp;Sign In</span>
           </Link>
         </p>

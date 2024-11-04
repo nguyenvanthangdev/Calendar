@@ -26,6 +26,12 @@ export async function handleCredentialsSignin({
     throw error;
   }
 }
+export async function handleSignInGoogle() {
+  await signIn("google", { redirectTo: "/dashboard" });
+}
+export async function handleSignInGithub() {
+  await signIn("github", { redirectTo: "/dashboard" });
+}
 
 export async function handleSignOut() {
   await signOut({ redirectTo: "/" });

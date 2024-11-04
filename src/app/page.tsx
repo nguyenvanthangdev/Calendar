@@ -13,7 +13,7 @@ export default async function Home() {
       </div>
       <div>
         <Button asChild className="text-xl">
-          <Link href={!session?.user?.id ? "/auth/sign-in" : "/dashboard"}>
+          <Link href={!session?.user?.id ? "/sign-in" : "/dashboard"}>
             {!session?.user?.id ? "Sign In" : "Dashboard"}
           </Link>
         </Button>

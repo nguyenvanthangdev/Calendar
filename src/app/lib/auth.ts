@@ -37,7 +37,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               body: JSON.stringify(credentials),
             }
           );
-
           const user = await res.json();
           console.log("check user", user);
           if (!res.ok) {
@@ -65,6 +64,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   pages: {
-    signIn: "/auth/sign-in",
+    signIn: "/sign-in",
   },
 });
