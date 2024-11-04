@@ -22,19 +22,27 @@ import {
   FormField,
   FormItem,
   FormMessage,
+  FormLabel,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { registerSchema } from "@/app/lib/schemas";
+import { registerSchema } from "@/app/lib/zod";
 import {
+  handleSignUp,
   handleSignInGithub,
   handleSignInGoogle,
 } from "@/app/actions/authAction";
-import LoadingButton from "@/components/loading-button";
+import { SuccessMessage } from "@/components/success-message";
+import { ErrorMessage } from "@/components/error-message";
+import { useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+//import LoadingButton from "@/components/loading-button";
 export default function SignUpPage() {
   const { toast } = useToast();
-  type FormData = z.infer<typeof registerSchema>;
-  const form = useForm<FormData>({
+  const [error, setErorr] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+  const [isPending, startTransition] = useTransition();
+  const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
@@ -42,34 +50,25 @@ export default function SignUpPage() {
       password: "",
     },
   });
-  const onSubmit = async (values: FormData) => {
+  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+      setErorr("");
+      setSuccess("");
+      startTransition(() => {
+        handleSignUp(values).then((data) => {
+          if (data.error) {
+            setErorr(data.error);
+          } else {
+            setSuccess(data.success);
+            form.reset();
+          }
+        });
       });
-      if (response.ok) {
-        toast({
-          title: "Notification",
-          description: "User created successfully !",
-          action: <ToastAction altText="Undo">Undo</ToastAction>,
-        });
-        form.reset();
-      } else {
-        const errorData = await response.json();
-        toast({
-          variant: "destructive",
-          title: "Something went wrong !",
-          description: errorData.message,
-          action: <ToastAction altText="Try again">Try again</ToastAction>,
-        });
-      }
     } catch (err) {
       toast({
         title: "Error !",
         variant: "destructive",
-        description: "An unexpected error occurred",
+        description: "Sever Error !",
         action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
       console.error(err);
@@ -101,9 +100,11 @@ export default function SignUpPage() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
+                      disabled={isPending}
                       type="text"
                       placeholder="Enter your name"
                     />
@@ -117,9 +118,11 @@ export default function SignUpPage() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
+                      disabled={isPending}
                       type="email"
                       placeholder="Enter email address"
                     />
@@ -133,9 +136,11 @@ export default function SignUpPage() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
+                      disabled={isPending}
                       type="password"
                       placeholder="Enter password"
                     />
@@ -144,7 +149,17 @@ export default function SignUpPage() {
                 </FormItem>
               )}
             />
-            <LoadingButton pending={form.formState.isSubmitting} />
+            <ErrorMessage message={error} />
+            <SuccessMessage message={success} />
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="w-full"
+              size={"lg"}
+            >
+              Sign Up
+            </Button>
+            {/* <LoadingButton pending={form.formState.isSubmitting} /> */}
           </form>
         </Form>
       </CardContent>

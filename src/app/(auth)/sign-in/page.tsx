@@ -15,38 +15,43 @@ import {
   FormField,
   FormItem,
   FormMessage,
+  FormLabel,
 } from "@/components/ui/form";
 //import { useToast } from "@/hooks/use-toast";
 //import { ToastAction } from "@/components/ui/toast";
 import { DottedSeparator } from "@/components/dotted-separator";
-import { signInSchema } from "@/app/lib/zod";
-import LoadingButton from "@/components/loading-button";
+import { loginSchema } from "@/app/lib/zod";
+//import LoadingButton from "@/components/loading-button";
 import {
-  handleCredentialsSignin,
+  handleSignIn,
   handleSignInGithub,
   handleSignInGoogle,
 } from "@/app/actions/authAction";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+import { SuccessMessage } from "@/components/success-message";
+import { ErrorMessage } from "@/components/error-message";
 export default function SignInPage() {
   //const { toast } = useToast();
-  const form = useForm<z.infer<typeof signInSchema>>({
-    resolver: zodResolver(signInSchema),
+  const [error, setErorr] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+  const [isPending, startTransition] = useTransition();
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
-  const [, setGlobalError] = useState<string>("");
-  const onSubmit = async (values: z.infer<typeof signInSchema>) => {
-    try {
-      const result = await handleCredentialsSignin(values);
-      console.log("check result", result);
-      if (result?.message) {
-        setGlobalError(result.message);
-      }
-    } catch (error) {
-      console.log("An unexpected error occurred. Please try again.");
-    }
+  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    setErorr("");
+    setSuccess("");
+    startTransition(() => {
+      handleSignIn(values).then((data) => {
+        setErorr(data.error);
+        setSuccess(data.success);
+      });
+    });
   };
   return (
     <Card className="w-full md:w-[487px] border-none shadow-md">
@@ -64,9 +69,11 @@ export default function SignInPage() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
+                      disabled={isPending}
                       type="email"
                       placeholder="Enter email address"
                     />
@@ -80,9 +87,11 @@ export default function SignInPage() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
+                      disabled={isPending}
                       type="password"
                       placeholder="Enter password"
                     />
@@ -91,7 +100,17 @@ export default function SignInPage() {
                 </FormItem>
               )}
             />
-            <LoadingButton pending={form.formState.isSubmitting} />
+            <ErrorMessage message={error} />
+            <SuccessMessage message={success} />
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="w-full"
+              size={"lg"}
+            >
+              Login
+            </Button>
+            {/* <LoadingButton pending={form.formState.isSubmitting} /> */}
           </form>
         </Form>
       </CardContent>

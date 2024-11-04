@@ -1,14 +1,16 @@
-import { TriangleIcon } from "lucide-react";
-
-export default function ErrorMessage({ error }: { error: string }) {
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+interface FormErroProps {
+  message?: string;
+}
+export const ErrorMessage = ({ message }: FormErroProps) => {
+  if (!message) return null;
   return (
     <div
-      className="flex w-full items-center p-4 mb-4 gap-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
-      role="alert"
+      className="bg-destructive/15 p-3 rounded-md flex
+    items-center gap-x-2 text-sm text-destructive"
     >
-      <TriangleIcon className="h-4 w-4 text-red-500" />
-      <span className="sr-only">Error</span>
-      <div>{error}</div>
+      <ExclamationTriangleIcon className="h-4 w-4" />
+      <p>{message}</p>
     </div>
   );
-}
+};
