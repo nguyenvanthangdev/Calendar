@@ -3,11 +3,12 @@ import { signIn, signOut } from "@/app/lib/auth";
 import * as z from "zod";
 import { loginSchema, registerSchema } from "../lib/zod";
 import bcrypt from "bcryptjs";
-import prisma from "../lib/db";
-import { getUserByEmail } from "../data/user";
+import prisma from "@/app/lib/db";
+import { getUserByEmail } from "@/app/data/user";
+import { DEFAULT_LOGIN_REDIRECT } from "@/app/lib/routes";
+import { AuthError } from "next-auth";
 
 export const handleSignUp = async (values: z.infer<typeof registerSchema>) => {
-  console.log(values);
   const validatedFields = registerSchema.safeParse(values);
   if (!validatedFields.success) return { error: "Invalid Fields !" };
   const { name, email, password } = validatedFields.data;
@@ -28,18 +29,34 @@ export const handleSignUp = async (values: z.infer<typeof registerSchema>) => {
 };
 
 export const handleSignIn = async (values: z.infer<typeof loginSchema>) => {
-  console.log(values);
   const validatedFields = loginSchema.safeParse(values);
   if (!validatedFields.success) return { error: "Invalid Fields !" };
-  return { success: "Email sent" };
+  const { email, password } = validatedFields.data;
+  try {
+    await signIn("credentials", {
+      email,
+      password,
+      redirectTo: DEFAULT_LOGIN_REDIRECT,
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return { error: "Incorrect email or password" };
+        default:
+          return { error: "An error occurred" };
+      }
+    }
+    throw error;
+  }
 };
 
 export async function handleSignInGoogle() {
-  await signIn("google", { redirectTo: "/dashboard" });
+  await signIn("google", { redirectTo: DEFAULT_LOGIN_REDIRECT });
 }
 
 export async function handleSignInGithub() {
-  await signIn("github", { redirectTo: "/dashboard" });
+  await signIn("github", { redirectTo: DEFAULT_LOGIN_REDIRECT });
 }
 
 export async function handleSignOut() {

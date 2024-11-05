@@ -17,11 +17,8 @@ import {
   FormMessage,
   FormLabel,
 } from "@/components/ui/form";
-//import { useToast } from "@/hooks/use-toast";
-//import { ToastAction } from "@/components/ui/toast";
 import { DottedSeparator } from "@/components/dotted-separator";
 import { loginSchema } from "@/app/lib/zod";
-//import LoadingButton from "@/components/loading-button";
 import {
   handleSignIn,
   handleSignInGithub,
@@ -29,12 +26,9 @@ import {
 } from "@/app/actions/authAction";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { SuccessMessage } from "@/components/success-message";
 import { ErrorMessage } from "@/components/error-message";
 export default function SignInPage() {
-  //const { toast } = useToast();
   const [error, setErorr] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -45,11 +39,9 @@ export default function SignInPage() {
   });
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setErorr("");
-    setSuccess("");
     startTransition(() => {
       handleSignIn(values).then((data) => {
-        setErorr(data.error);
-        setSuccess(data.success);
+        setErorr(data?.error);
       });
     });
   };
@@ -101,7 +93,6 @@ export default function SignInPage() {
               )}
             />
             <ErrorMessage message={error} />
-            <SuccessMessage message={success} />
             <Button
               type="submit"
               disabled={isPending}
@@ -110,7 +101,6 @@ export default function SignInPage() {
             >
               Login
             </Button>
-            {/* <LoadingButton pending={form.formState.isSubmitting} /> */}
           </form>
         </Form>
       </CardContent>

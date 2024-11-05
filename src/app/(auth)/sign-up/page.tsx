@@ -36,7 +36,6 @@ import { SuccessMessage } from "@/components/success-message";
 import { ErrorMessage } from "@/components/error-message";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-//import LoadingButton from "@/components/loading-button";
 export default function SignUpPage() {
   const { toast } = useToast();
   const [error, setErorr] = useState<string | undefined>("");
@@ -159,8 +158,6 @@ export default function SignUpPage() {
             >
               Sign Up
             </Button>
-
-            {/* <LoadingButton pending={form.formState.isSubmitting} /> */}
           </form>
         </Form>
       </CardContent>
