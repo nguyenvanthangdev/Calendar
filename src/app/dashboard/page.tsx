@@ -1,9 +1,13 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
+import { auth } from "@/app/lib/auth";
 //import { requireUser } from "../lib/session";
 export default async function DashboardPage() {
   //await requireUser();
+  const session = await auth();
+  console.log("Session in requireUser:", session);
+
   return (
     <>
       <div className="flex items-center justify-between px-2">

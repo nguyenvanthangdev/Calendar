@@ -1,24 +1,12 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import {
-  Home,
-  Settings,
-  Users,
-  Menu,
-  CircleUserRound,
-  LogOut,
-} from "lucide-react";
+import { Home, Settings, Users, Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Logo from "@/app/assets/logo.svg";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { handleSignOut } from "@/app/actions/authAction";
 
 export default function DashboardLayout({
@@ -94,23 +82,11 @@ export default function DashboardLayout({
         </ul>
         {/* Nút nằm ở cuối cùng của sidebar */}
         <div className="flex justify-center p-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button>
-                <CircleUserRound className="h-10 w-10" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <form action={handleSignOut}>
-                  <button className="flex items-center">
-                    <LogOut className="h-4 w-4" />
-                    <span>Log out</span>
-                  </button>
-                </form>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <form action={handleSignOut}>
+            <Button>
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </form>
         </div>
       </nav>
       <main

@@ -7,7 +7,7 @@ export default async function Home() {
   const session = await auth();
   return (
     <main
-      className="flex flex-col items-center justify-center h-screen gap-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-50
+      className="flex flex-col items-center justify-center h-screen gap-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-500
       to-white"
     >
       <div className="flex justify-center gap-1">
